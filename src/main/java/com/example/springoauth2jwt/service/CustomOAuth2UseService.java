@@ -1,8 +1,6 @@
 package com.example.springoauth2jwt.service;
 
-import com.example.springoauth2jwt.dto.GoogleResponse;
-import com.example.springoauth2jwt.dto.NaverResponse;
-import com.example.springoauth2jwt.dto.OAuth2Response;
+import com.example.springoauth2jwt.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -28,5 +26,14 @@ public class CustomOAuth2UseService extends DefaultOAuth2UserService {
         } else {
             return null;
         }
+
+        String username = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId();
+
+        UserDto userDto = new UserDto();
+        userDto.setUsername(username);
+        userDto.setName(oAuth2Response.getName());
+        userDto.setRole("ROLE_USER");
+
+        return new CustomOAuth2User(userDto);
     }
 }
