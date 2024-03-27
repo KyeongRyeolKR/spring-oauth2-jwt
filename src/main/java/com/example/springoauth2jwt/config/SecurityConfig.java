@@ -3,6 +3,7 @@ package com.example.springoauth2jwt.config;
 import com.example.springoauth2jwt.jwt.JwtFilter;
 import com.example.springoauth2jwt.oauth2.CustomSuccessHandler;
 import com.example.springoauth2jwt.service.CustomOAuth2UseService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,10 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -25,6 +30,28 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // 스프링 시큐리티의 CORS 설정
+        http
+                .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
+                    @Override
+                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                        CorsConfiguration configuration = new CorsConfiguration();
+
+                        // 프론트엔드가 백엔드에게 데이터를 주는 경우 설정
+                        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000")); // 프론트 URL
+                        configuration.setAllowedMethods(Collections.singletonList("*")); // 모든 메서드 허용
+                        configuration.setAllowCredentials(true); // credential 값 허용
+                        configuration.setAllowedHeaders(Collections.singletonList("*")); // 헤더 값 허용
+                        configuration.setMaxAge(3600L);
+
+                        // 백엔드가 프론트엔드에게 데이터를 주는 경우 설정
+                        configuration.setExposedHeaders(Collections.singletonList("Set-Cookie")); // 쿠키 반환 허용
+                        configuration.setExposedHeaders(Collections.singletonList("Authorization")); // Authorization 헤더 반환 허용
+
+                        return configuration;
+                    }
+                }));
+
         // csrf disable
         http.csrf(AbstractHttpConfigurer::disable);
 
