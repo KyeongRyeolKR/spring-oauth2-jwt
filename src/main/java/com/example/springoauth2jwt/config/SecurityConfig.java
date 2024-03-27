@@ -1,5 +1,6 @@
 package com.example.springoauth2jwt.config;
 
+import com.example.springoauth2jwt.jwt.JwtFilter;
 import com.example.springoauth2jwt.oauth2.CustomSuccessHandler;
 import com.example.springoauth2jwt.service.CustomOAuth2UseService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -19,6 +21,7 @@ public class SecurityConfig {
 
     private final CustomOAuth2UseService customOAuth2UseService;
     private final CustomSuccessHandler customSuccessHandler;
+    private final JwtFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -30,6 +33,9 @@ public class SecurityConfig {
 
         // HTTP Basic 인증 방식 disable
         http.httpBasic(AbstractHttpConfigurer::disable);
+
+        // JwtFilter 등록
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         // oauth2
         http.oauth2Login(
