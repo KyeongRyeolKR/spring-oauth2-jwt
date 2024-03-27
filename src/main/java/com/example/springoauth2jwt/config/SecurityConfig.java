@@ -1,5 +1,6 @@
 package com.example.springoauth2jwt.config;
 
+import com.example.springoauth2jwt.oauth2.CustomSuccessHandler;
 import com.example.springoauth2jwt.service.CustomOAuth2UseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final CustomOAuth2UseService customOAuth2UseService;
+    private final CustomSuccessHandler customSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -36,6 +38,7 @@ public class SecurityConfig {
                                 (userInfoEndpointConfig -> userInfoEndpointConfig
                                         .userService(customOAuth2UseService))
                         )
+                        .successHandler(customSuccessHandler) // 로그인 성공 핸들러 등록
         );
 
         // 경로별 인가 작업
